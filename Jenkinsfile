@@ -29,7 +29,7 @@ pipeline {
                 }
             }
             steps {
-                echo hello lagom
+                echo "hello lagom"
             }
         }
     }
