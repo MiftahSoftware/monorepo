@@ -1,4 +1,4 @@
-def projectDir = 'akka-http'
+def projectDir = '/home/azmathasan92/.jenkins/workspace/test/akka-http'
 
 pipeline{
     agent any
