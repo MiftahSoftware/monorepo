@@ -23,7 +23,10 @@ pipeline {
                 }
             }
             steps {
-                build akka-http
+                sh '''
+                     cd akka-http
+                     ./akka.sh
+                '''
             }
         }
         stage('lagom-service') {
@@ -34,7 +37,10 @@ pipeline {
                 }
             }
             steps {
-                build lagom-service
+                sh '''
+                     cd lagom-service
+                     ./lagom.sh
+                '''
             }
         }
     }
