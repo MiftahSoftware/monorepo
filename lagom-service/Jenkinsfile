@@ -12,7 +12,6 @@ pipeline{
             }
         }
 
-
         stage('run-test-cases'){
             steps{
                 sh '''
