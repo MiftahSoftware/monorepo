@@ -11,70 +11,16 @@ pipeline{
 
         stage('code-compile'){
             steps {
-                   sh '''
-                     mvn clean compile
-                   '''
-            }
-        }
-
-        stage('run-test-cases'){
-            steps{
-                sh '''
-                     mvn clean test
-                '''
-            }
-        }
-
-        stage('genarate-zip-artifact'){
-            steps{
-                sh '''
-                     mvn clean package
-                '''
-            }
-        }
-
-        stage('genarate-docker-image'){
-            steps{
-                sh '''
-                     docker build -t lagom-svc:latest -f Dockerfile .
-                '''
-            }
-        }
-
-        stage('store-artifact'){
-            steps{
-                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dfd73f0a-155e-45a4-96ce-e5d2c233bb6d', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-                     sh '''
-                        docker tag lagom-svc:latest azmathasan92/lagom-service:1.0
-                        docker login --username $USERNAME --password $PASSWORD
-                        docker push azmathasan92/lagom-service:1.0
-                    '''
+                dir(projectDir) {
+                    sh "mvn test"
                 }
             }
         }
 
-        stage('run-run-lagom-deploy-manifest'){
-            steps{
-                sh '''
-                    kubectl apply -f lagom-deploy.yaml
-                '''
-            }
-        }
+
+
 
    }
-    post {
-        always {
-            deleteDir()
-        }
-        success {
-             echo 'CI/CD Successfully Completed'
-        }
-        failure {
-             mail to: 'azmathasan92@gmail.com',
-             subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
-             body: "Something is wrong with ${env.BUILD_URL}"
-        }
-    }
 
 
 
