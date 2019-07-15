@@ -1,0 +1,69 @@
+pipeline{
+
+    agent any
+
+    stages{
+
+        stage('code-compile'){
+            steps {
+                   sh '''
+                     sbt clean compile
+                   '''
+            }
+        }
+
+        stage('generate-jar'){
+              steps {
+                   sh '''
+                     sbt clean assembly
+                   '''
+              }
+        }
+
+        stage('genarate-docker-image'){
+            steps{
+                sh '''
+                    docker build -t akka-http:latest -f DockerFile .
+                '''
+            }
+        }
+
+
+        stage('push-docker-image'){
+            steps{
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dfd73f0a-155e-45a4-96ce-e5d2c233bb6d', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                     sh '''
+                        docker tag akka-http:latest azmathasan92/akka-http-service:1.0
+                        docker login --username $USERNAME --password $PASSWORD
+                        docker push azmathasan92/akka-http-service:1.0
+                    '''
+                }
+            }
+        }
+
+        stage('run-run-akka-deploy-manifest'){
+            steps{
+                sh '''
+                    kubectl apply -f akka-http-deploy.yaml
+
+                '''
+            }
+        }
+
+   }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'target/scala-2.12/akka-http-service-assembly-0.1.jar', fingerprint: true
+        }
+        success {
+             echo 'CI/CD Successfully Completed'
+        }
+        failure {
+             mail to: 'azmathasan92@gmail.com',
+             subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+             body: "Something is wrong with ${env.BUILD_URL}"
+        }
+    }
+
+}

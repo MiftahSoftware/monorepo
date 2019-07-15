@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: es-master-svc
+  labels:
+    app: elasticsearch
+spec:
+  selector:
+    component: elasticsearch
+    role: master
+  clusterIP: None
+  ports:
+    - port: 9200
+      name: serving
+    - port: 9300
+      name: node-to-node
+
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: es-master
+  labels:
+    role: master
+    component: elasticsearch
+spec:
+  selector:
+    matchLabels:
+      component: elasticsearch
+      role: master
+  serviceName: es-master-svc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: elasticsearch
+        role: master
+    spec:
+      initContainers:
+        - name: fix
+          image: busybox
+          command:
+            - sh
+            - -c
+            - chown -R 1000:1000 /usr/share/elasticsearch/data
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/elasticsearch/data
+        - name: increase-the-vm-max-map-count
+          image: busybox
+          command:
+            - sysctl
+            - -w
+            - vm.max_map_count=262144
+          securityContext:
+            privileged: true
+        - name: increase-the-ulimit
+          image: busybox
+          command:
+            - sh
+            - -c
+            - ulimit -n 65536
+          securityContext:
+            privileged: true
+      containers:
+        - name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.1.1
+          ports:
+            - containerPort: 9200
+              name: http
+            - containerPort: 9300
+              name: tcp
+          resources:
+            requests:
+              memory: 1Gi
+            limits:
+              memory: 2Gi
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/elasticsearch/data
+          env:
+            - name: node.master
+              value: "true"
+            - name: node.data
+              value: "false"
+            - name: node.ingest
+              value: "false"
+            - name: node.ml
+              value: "false"
+            - name: xpack.ml.enabled
+              value: "true"
+            - name: cluster.remote.connect
+              value: "true"
+            - name: node.name
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: cluster.name
+              value: elasticsearch-cluster
+            - name: cluster.initial_master_nodes
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: discovery.seed_hosts
+              value: es-master-0.es-master-svc:9300
+            - name: ES_JAVA_OPTS
+              value: -Xms512m -Xmx512m
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: "fast"
+        resources:
+          requests:
+            storage: 2Gi

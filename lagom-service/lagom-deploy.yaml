@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lagom-deployment
+  labels:
+    app: lagom-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lagom-app
+  template:
+    metadata:
+      labels:
+        app: lagom-app
+    spec:
+      terminationGracePeriodSeconds: 300
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - lagom-app
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: lagom-container
+          image: azmathasan92/lagom-service:1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+          env:
+          - name: CAS_CONTACT_POINT_ONE
+            value: "cassandra-0.cassandra.default.svc.cluster.local"
+          - name: CAS_CONTACT_POINTS_PORT
+            value: "9042"
+          - name: CASSANDRA_KEYSPACE
+            value: "employee"
+          - name: KAFKA_BOOTSTRAP_SERVERS
+            value: "kafka-0.kafka-svc.default.svc.cluster.local:9093"
+          - name: EMPLOYEE_TOPIC_NAME
+            value: "employeesDetail"
+          - name: EMPLOYEE_TOPIC_CONSUMER_GROUP
+            value: "employee_group_local"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lagom-service-node-port
+spec:
+  selector:
+    app: lagom-app
+  type: NodePort
+  ports:
+    - port: 9000
+      targetPort: 9000
+      nodePort: 30002

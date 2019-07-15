@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: akka-deployment
+  labels:
+    app: akka-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: akka-app
+  template:
+    metadata:
+      labels:
+        app: akka-app
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - akka-app
+              topologyKey: "kubernetes.io/hostname"
+      terminationGracePeriodSeconds: 300
+      containers:
+        - name: akka-container
+          image: azmathasan92/akka-http-service:1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ELASTICSEARCH_PORT
+              value: "9200"
+            - name: ELASTICSEARCH_HOST
+              value: "es-master-0.es-master-svc.default.svc.cluster.local"
+            - name: ELASTICSEARCH_INDEX
+              value: "emp_address_index"
+            - name: ELASTICSEARCH_TYPE
+              value: "emp_address"
+            - name: KAFKA_TOPIC
+              value: "employeesDetail"
+            - name: KAFKA_SERVER
+              value: "kafka-0.kafka-svc.default.svc.cluster.local:9093"
+            - name: AKKA_HTTP_HOST
+              value: "0.0.0.0"
+            - name: AKKA_HTTP_PORT
+              value: "8080"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: akka-service-node-port
+spec:
+  selector:
+    app: akka-app
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30000
+
