@@ -1,6 +1,13 @@
+def projectDir = '/home/azmathasan92/.jenkins/workspace/monorepo-experiments-master/akka-http'
+
 pipeline{
 
-    agent any
+    agent {
+        node {
+            label 'common-ws-agent'
+            customWorkspace 'monorepo-experiments-master'
+        }
+    }
 
     stages{
 

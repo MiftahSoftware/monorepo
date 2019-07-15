@@ -1,7 +1,12 @@
-def projectDir = '/home/azmathasan92/.jenkins/workspace/test/akka-http'
+def projectDir = '/home/azmathasan92/.jenkins/workspace/monorepo-experiments-master/lagom-service'
 
 pipeline{
-    agent any
+    agent {
+        node {
+            label 'common-ws-agent'
+            customWorkspace 'monorepo-experiments-master'
+        }
+    }
 
     options {
         skipDefaultCheckout true

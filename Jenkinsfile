@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        node {
+            label 'common-ws-agent'
+            customWorkspace 'monorepo-experiments-master'
+        }
+    }
     stages {
         stage('init') {
             steps {
