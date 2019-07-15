@@ -1,19 +1,36 @@
-pipeline{
-
+pipeline {
     agent any
-
-    stages{
-
-        stage('code-compile'){
+    stages {
+        stage('init') {
             steps {
-                   sh '''
-                     changed_folders=`git diff --name-only $SHIPPABLE_COMMIT_RANGE | grep / | awk 'BEGIN {FS="/"} {print $1}' | uniq`
-                     echo "changed folders "$changed_folders
-                   '''
+                script {
+                    def scmVars = checkout scm
+                    env.MY_GIT_PREVIOUS_SUCCESSFUL_COMMIT = scmVars.GIT_PREVIOUS_SUCCESSFUL_COMMIT
+                }
             }
         }
 
-
-   }
-
+        stage('akka-http') {
+            when {
+                expression {
+                    matches = sh(returnStatus: true, script: "git diff --name-only $MY_GIT_PREVIOUS_SUCCESSFUL_COMMIT|egrep -q '^akka-http'")
+                    return !matches
+                }
+            }
+            steps {
+                build 'akka-http'
+            }
+        }
+        stage('play-b') {
+            when {
+                expression {
+                    matches = sh(returnStatus: true, script: "git diff --name-only $MY_GIT_PREVIOUS_SUCCESSFUL_COMMIT|egrep -q '^lagom-service'")
+                    return !matches
+                }
+            }
+            steps {
+                build 'lagom-service'
+            }
+        }
+    }
 }
