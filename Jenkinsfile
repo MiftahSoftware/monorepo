@@ -29,7 +29,7 @@ pipeline {
                 }
             }
             steps {
-                build "hello lagom"
+                build lagom-service
             }
         }
     }
