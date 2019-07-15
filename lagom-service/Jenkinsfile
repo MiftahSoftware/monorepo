@@ -15,7 +15,7 @@ pipeline{
         stage('code-compile'){
             steps {
                 dir(projectDir) {
-                    sh "mvn test"
+                    sh "mvn clean compile"
                 }
             }
         }

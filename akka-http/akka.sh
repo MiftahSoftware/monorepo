@@ -1,6 +1,3 @@
-echo "Checkout Directory"
-cd akka-http
-
 echo "code compile"
 sbt clean compile
 

@@ -1,11 +1,9 @@
 pipeline {
-    agent {
-        node {
-            label 'master'
-            customWorkspace 'monorepo-experiments-master'
-        }
-    }
+
+    agent any
+
     stages {
+
         stage('init') {
             steps {
                 script {
@@ -29,6 +27,7 @@ pipeline {
                 '''
             }
         }
+
         stage('lagom-service') {
             when {
                 expression {
@@ -44,4 +43,20 @@ pipeline {
             }
         }
     }
+
+    post {
+        always {
+            deleteDir()
+        }
+        success {
+             echo 'CI/CD Successfully Completed'
+        }
+        failure {
+             mail to: 'azmathasan92@gmail.com',
+             subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+             body: "Something is wrong with ${env.BUILD_URL}"
+        }
+
+    }
+
 }
