@@ -1,10 +1,5 @@
 pipeline{
-    agent {
-        node {
-            label 'master'
-            customWorkspace 'monorepo-experiments-master'
-        }
-    }
+    agent any
 
     options {
         skipDefaultCheckout true

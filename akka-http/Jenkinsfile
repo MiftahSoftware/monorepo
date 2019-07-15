@@ -1,11 +1,6 @@
 pipeline{
 
-    agent {
-        node {
-            label 'master'
-            customWorkspace 'monorepo-experiments-master'
-        }
-    }
+    agent any
 
     stages{
 
@@ -69,8 +64,6 @@ pipeline{
              subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
              body: "Something is wrong with ${env.BUILD_URL}"
         }
-
-
 
     }
 
