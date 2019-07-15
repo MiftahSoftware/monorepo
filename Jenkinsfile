@@ -21,7 +21,7 @@ pipeline {
                 build 'akka-http'
             }
         }
-        stage('play-b') {
+        stage('lagom-service') {
             when {
                 expression {
                     matches = sh(returnStatus: true, script: "git diff --name-only $MY_GIT_PREVIOUS_SUCCESSFUL_COMMIT|egrep -q '^lagom-service'")
