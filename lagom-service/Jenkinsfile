@@ -3,7 +3,7 @@ def projectDir = '/home/azmathasan92/.jenkins/workspace/monorepo-experiments-mas
 pipeline{
     agent {
         node {
-            label 'common-ws-agent'
+            label 'master'
             customWorkspace 'monorepo-experiments-master'
         }
     }
