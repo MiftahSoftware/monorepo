@@ -18,7 +18,7 @@ pipeline {
                 }
             }
             steps {
-                build 'akka-http'
+                echo "hello azmat"
             }
         }
         stage('lagom-service') {
