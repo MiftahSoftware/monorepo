@@ -18,7 +18,7 @@ pipeline {
                 }
             }
             steps {
-                echo "hello azmat"
+                build akka-http
             }
         }
         stage('lagom-service') {
@@ -29,7 +29,7 @@ pipeline {
                 }
             }
             steps {
-                echo "hello lagom"
+                build "hello lagom"
             }
         }
     }

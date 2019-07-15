@@ -1,6 +1,11 @@
-pipeline{
+def projectDir = 'akka-http'
 
+pipeline{
     agent any
+
+    options {
+        skipDefaultCheckout true
+    }
 
     stages{
 
