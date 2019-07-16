@@ -5,7 +5,7 @@ metadata:
   labels:
     app: lagom-app
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: lagom-app
@@ -14,17 +14,6 @@ spec:
       labels:
         app: lagom-app
     spec:
-      terminationGracePeriodSeconds: 300
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: "app"
-                    operator: In
-                    values:
-                      - lagom-app
-              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: lagom-container
           image: azmathasan92/lagom-service:1.0
