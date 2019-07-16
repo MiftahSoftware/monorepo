@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: lagom-container
-          image: azmathasan92/lagom-service:1.0
+          image: azmathasan92/lagom-service:test
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
