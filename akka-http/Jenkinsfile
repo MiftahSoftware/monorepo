@@ -2,7 +2,6 @@ pipeline{
 
     agent any
 
-
     stages{
 
         stage('code-compile'){
@@ -12,6 +11,7 @@ pipeline{
                    '''
             }
         }
+        
 
         stage('generate-jar'){
               steps {
