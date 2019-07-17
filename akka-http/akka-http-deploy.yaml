@@ -14,17 +14,6 @@ spec:
       labels:
         app: akka-app
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: "app"
-                    operator: In
-                    values:
-                      - akka-app
-              topologyKey: "kubernetes.io/hostname"
-      terminationGracePeriodSeconds: 300
       containers:
         - name: akka-container
           image: azmathasan92/akka-http-service:1.0
