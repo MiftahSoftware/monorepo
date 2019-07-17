@@ -4,8 +4,6 @@ pipeline{
     options {
         skipDefaultCheckout true
     }
-
-
     stages{
 
         stage('code-compile'){
@@ -15,6 +13,7 @@ pipeline{
                 }
             }
         }
+        
 
         stage('run-test-cases'){
             steps{
